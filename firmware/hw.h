@@ -15,9 +15,9 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 // LEDs
 #define ILLUMINATE          2,1
-#define ILLUMINATE_ON()     HW_SET(ILLUMINATE,_HIGH)
-#define ILLUMINATE_OFF()    HW_SET(ILLUMINATE,_LOW)
-#define ILLUMINATE_TOGGLE() HW_SET(ILLUMINATE,_TOGGLE)
+#define ILLUMINATE_ON()     HW_SET_HIGH(ILLUMINATE)
+#define ILLUMINATE_OFF()    HW_SET_LOW(ILLUMINATE)
+#define ILLUMINATE_TOGGLE() HW_SET_TOGGLE(ILLUMINATE)
 
 #define INDICATE            2,2
 #define INDICATE_ON()       HW_SET(INDICATE,_LOW)

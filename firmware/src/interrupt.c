@@ -8,9 +8,13 @@
 #include "interrupt.h"
 
 /** @brief table of function pointers attached to port1 GPIO pins*/
+#ifdef NUM_P1_INTS
 static InterruptFn p1_int_table[NUM_P1_INTS];
+#endif
 /** @brief table of function pointers attached to port2 GPIO pins*/
+#ifdef NUM_P2_INTS
 static InterruptFn p2_int_table[NUM_P2_INTS];
+#endif
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /**
@@ -39,21 +43,6 @@ corresponding function.
 */
 static __interrupt void Port2(void);
 
-/**
-@brief Port 3 interrupt service routine
-@details
-Go through each bit in the interrupt flag to see if it is set. If it is run the
-corresponding function.
-*/
-static __interrupt void Port3(void);
-
-/**
-@brief Port 4 interrupt service routine
-@details
-Go through each bit in the interrupt flag to see if it is set. If it is run the
-corresponding function.
-*/
-static __interrupt void Port4(void);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 // Note: functions called from GPIO interrupts have no access to timer-based
@@ -79,8 +68,12 @@ void InterruptAttach(uint8_t port, uint8_t pin, InterruptFn func, enum IntEdgeTy
 
     switch (port)
     {
+#ifdef NUM_P1_INTS
         ATTACH_CASE(1);
+#endif
+#ifdef NUM_P2_INTS
         ATTACH_CASE(2);
+#endif
     }
 #undef ATTACH_CASE
 }
@@ -98,8 +91,12 @@ void InterruptDetach(uint8_t port, uint8_t pin)
 
     switch (port)
     {
+#ifdef NUM_P1_INTS
         DETACH_CASE(1);
+#endif
+#ifdef NUM_P2_INTS
         DETACH_CASE(2);
+#endif
     }
 #undef DETACH_CASE
 }
@@ -128,8 +125,12 @@ void InterruptRunOnPort(uint8_t port)
     _DINT();
     switch(port)
     {
+#ifdef NUM_P1_INTS
         PORT_CASE(1);
+#endif
+#ifdef NUM_P2_INTS
         PORT_CASE(2);
+#endif
     }
     _EINT();
 #undef PORT_CASE

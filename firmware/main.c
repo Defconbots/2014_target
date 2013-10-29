@@ -7,9 +7,26 @@
 #include "interrupt.h"
 #include "state.h"
 
+enum Event
+{
+    DEFAULT_EVENTS,     // Enter, idle, exit
+    OMG_LASER_PEW_PEW,
+    HIT_TIMEOUT
+};
+
+void idle(uint8_t ev);
+void i_am_shot(uint8_t ev);
+StateMachine s;
+
+Transition rules[] =
+{
+    {idle,      OMG_LASER_PEW_PEW,   i_am_shot},
+    {i_am_shot, HIT_TIMEOUT,         idle}
+};
+
 void HwInit(void)
 {
-    HW_INPUT(LASER_DETECT_1);
+	HW_INPUT(LASER_DETECT_1);
     HW_INPUT(LASER_DETECT_2);
     HW_OUTPUT(ILLUMINATE);
     HW_OUTPUT(INDICATE);
@@ -36,24 +53,6 @@ void hit(void)
         hit_time = 0;
     }
 }
-
-enum Event
-{
-    DEFAULT_EVENTS,     // Enter, idle, exit
-    OMG_LASER_PEW_PEW,
-    HIT_TIMEOUT
-};
-
-State idle;
-State i_am_shot;
-StateMachine s;
-
-Transition rules[] =
-{
-    {idle,      OMG_LASER_PEW_PEW,   hit},
-    {i_am_shot, HIT_TIMEOUT,         idle}
-};
-
 
 void main(void)
 {
