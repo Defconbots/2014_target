@@ -16,6 +16,23 @@ typedef void (*InterruptFn)(void);
 
 #define GPIO(name) name##_PORT,name##_PIN
 
+
+/**
+@brief Port 1 interrupt service routine
+@details
+Go through each bit in the interrupt flag to see if it is set. If it is run the
+corresponding function.
+*/
+extern __interrupt void Port1(void);
+
+/**
+@brief Port 2 interrupt service routine
+@details
+Go through each bit in the interrupt flag to see if it is set. If it is run the
+corresponding function.
+*/
+extern __interrupt void Port2(void);
+
 /**
 @brief Attach function to GPIO pin edge interrupt
 @details

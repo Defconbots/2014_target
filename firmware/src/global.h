@@ -8,7 +8,7 @@
 
 // for ascii art: http://patorjk.com/software/taag/
 
-#include "msp430.h"
+#include <msp430.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>

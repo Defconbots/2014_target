@@ -27,23 +27,6 @@ corresponding function.
 */
 static void InterruptRunOnPort(uint8_t port);
 
-/**
-@brief Port 1 interrupt service routine
-@details
-Go through each bit in the interrupt flag to see if it is set. If it is run the
-corresponding function.
-*/
-static __interrupt void Port1(void);
-
-/**
-@brief Port 2 interrupt service routine
-@details
-Go through each bit in the interrupt flag to see if it is set. If it is run the
-corresponding function.
-*/
-static __interrupt void Port2(void);
-
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 // Note: functions called from GPIO interrupts have no access to timer-based
 // facilities (like the global "g_now" variable used for timing). The current

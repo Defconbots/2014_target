@@ -49,6 +49,13 @@ flexible timing.
 extern void ScheduleTimerInit(void);
 
 /**
+@brief Interrupt routine run by overflow of watchdog timer
+@details
+When the interrupt fires increment the global time and service the call*s.
+*/
+extern __interrupt void ScheduleTimerOverflow(void);
+
+/**
 @brief Get the current tick time
 @details
 Every tick of the time a variable is incremented. This function gets the

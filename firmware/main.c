@@ -54,14 +54,25 @@ void hit(void)
     }
 }
 
+void blink(void)
+{
+	ILLUMINATE_TOGGLE();
+	INDICATE_TOGGLE();
+	CalloutRegister(blink,500 * _MILLISECOND);
+}
+
 void main(void)
 {
     WD_STOP();
     ClockConfig(16);
     ScheduleTimerInit();
     HwInit();
-    s = StateMachineCreate(rules, sizeof(rules),idle);
+    //s = StateMachineCreate(rules, sizeof(rules),idle);
     _EINT();
+
+    INDICATE_ON();
+    blink();
+    while(1);
 
     while (1)
     {

@@ -20,7 +20,7 @@
 #define SCHEDULE_VECTOR WDT_VECTOR
 
 // global time
-volatile uint32_t now = 0;
+uint32_t now = 0;
 
 // multiplier for timing
 volatile uint8_t g_timing_multiplier = 0;
@@ -67,13 +67,6 @@ in the map.
 static void CalloutService(uint32_t current_time);
 
 /**
-@brief Interrupt routine run by overflow of watchdog timer
-@details
-When the interrupt fires increment the global time and service the call*s.
-*/
-static __interrupt void ScheduleTimerOverflow(void);
-
-/**
 @brief Return the number of occupied slots in the callout map (pending callouts)
 @details
 Use K&R method to run through the callout map and count the number of bits. This
@@ -112,7 +105,7 @@ uint32_t TimeNow(void)
 //        /___//_/ /_/ \__/ \___//_/   /_/    \__,_// .___/ \__/
 //                                                 /_/
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-#pragma vector = SCHEDULE_VECTOR
+#pragma vector=SCHEDULE_VECTOR
 __interrupt void ScheduleTimerOverflow(void)
 {
     now++;
@@ -213,7 +206,6 @@ int8_t CalloutRegister(CalloutFn func, uint32_t run_time)
                 // save our data
                 callout_store[i].func = func;
                 callout_store[i].run_time = now + run_time;
-                // return success
                 return (SUCCESS);
             }
         }

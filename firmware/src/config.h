@@ -20,7 +20,7 @@
 // the clock during runtime you do not need to enable this.
 //#define ADJUST_SCHEDULER_ON_CLOCK_CONFIG
 #define MAX_CALLBACK_CNT    3
-#define MAX_CALLOUT_CNT     6
+#define MAX_CALLOUT_CNT     3
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //    _____  __          __           __  ___              __     _
@@ -31,28 +31,5 @@
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #define MAX_EVENT_CNT       10
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//                       __  __ ___     ____  ______
-//                      / / / //   |   / __ \/_  __/
-//                     / / / // /| |  / /_/ / / /
-//                    / /_/ // ___ | / _, _/ / /
-//                    \____//_/  |_|/_/ |_| /_/
-//
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-// When using non-blocking uart keep in mind the buffer can be filled very
-// quickly and cause problems. If you want to push a lot of data over the asynch
-// interface you'll need to either queue packets in software, make the
-// tx_buf_cnt very large, or put delays between messages to allow the buffer to
-// be emptied.
-
-// Define the below with values to enable async tx or rx
-//#define MAX_UART_RX_BUF_CNT 20
-//#define MAX_UART_TX_BUF_CNT 200
-
-#ifdef TEST
-#define MAX_UART_RX_BUF_CNT 20
-#define MAX_UART_TX_BUF_CNT 200
-#endif
 
 #endif
