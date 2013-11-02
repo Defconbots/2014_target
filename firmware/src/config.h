@@ -20,7 +20,7 @@
 // the clock during runtime you do not need to enable this.
 //#define ADJUST_SCHEDULER_ON_CLOCK_CONFIG
 #define MAX_CALLBACK_CNT    3
-#define MAX_CALLOUT_CNT     3
+#define MAX_CALLOUT_CNT     10
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //    _____  __          __           __  ___              __     _

@@ -37,7 +37,6 @@ void InterruptAttach(uint8_t port, uint8_t pin, InterruptFn func, enum IntEdgeTy
 #define ATTACH_CASE(x)                  \
     case x:                             \
         p##x##_int_table[pin] = func;   \
-        P##x##IFG &= ~_BV(pin);         \
         if (type == FALLING)            \
         {                               \
             P##x##IES |= _BV(pin);      \
@@ -47,6 +46,7 @@ void InterruptAttach(uint8_t port, uint8_t pin, InterruptFn func, enum IntEdgeTy
             P##x##IES &= ~_BV(pin);     \
         }                               \
         P##x##IE |= _BV(pin);           \
+        P##x##IFG &= ~_BV(pin);         \
         break;
 
     switch (port)
@@ -98,8 +98,8 @@ void InterruptRunOnPort(uint8_t port)
             {                                                           \
                 if ((P##x##IFG & _BV(i)) && p##x##_int_table[i] != NULL)\
                 {                                                       \
-                    p##x##_int_table[i]();                              \
                     P##x##IFG &= ~_BV(i);                               \
+                    p##x##_int_table[i]();                              \
                 }                                                       \
             }                                                           \
         }                                                               \
