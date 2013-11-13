@@ -6,6 +6,7 @@
 #include "hardware_init.h"
 #include "interrupt.h"
 #include "state.h"
+#include "adc.h"
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //                        State machine config
@@ -33,6 +34,7 @@ Transition rules[] =
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 void HwInit(void)
 {
+    AdcInit();
     HW_INPUT(LASER_DETECT_1);
     HW_INPUT(LASER_DETECT_2);
     HW_OUTPUT(ILLUMINATE);
@@ -44,25 +46,15 @@ void HwInit(void)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //                           Interrupt handlers
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-void hit(void)
+void CheckForHit(void)
 {
-    static uint32_t hit_time;
-    if (!hit_time)
+    static uint32_t laser_hit_count;
+    uint16_t sample = AdcRead(LASER_DETECT_1_ADC);
+    laser_hit_count = (sample > 400) ? laser_hit_count + 1 : 0;
+    if (laser_hit_count > 5)
     {
-        hit_time = TimeNow();
-        InterruptAttach(LASER_DETECT_1,hit,RISING);
-        InterruptAttach(LASER_DETECT_2,hit,RISING);
-    }
-    else
-    {
-        uint32_t hit_duration = TimeNow() - hit_time;
-        if (hit_duration > 300ul * _MILLISECOND && hit_duration < 1000ul * _MILLISECOND)
-        {
-            StateMachinePublishEvent(&s,OMG_LASER_PEW_PEW);
-        }
-        InterruptAttach(LASER_DETECT_1,hit,FALLING);
-        InterruptAttach(LASER_DETECT_2,hit,FALLING);
-        hit_time = 0;
+        StateMachinePublishEvent(&s,OMG_LASER_PEW_PEW);
+        laser_hit_count = 0;
     }
 }
 
@@ -75,16 +67,14 @@ void idle(uint8_t ev)
     {
         case ENTER:
         {
-            InterruptAttach(LASER_DETECT_1,hit,FALLING);
-            InterruptAttach(LASER_DETECT_2,hit,FALLING);
+        	CallbackMode(CheckForHit,ENABLED);
             ILLUMINATE_ON();
             INDICATE_OFF();
             break;
         }
         case EXIT:
         {
-            InterruptDetach(LASER_DETECT_1);
-            InterruptDetach(LASER_DETECT_2);
+        	CallbackMode(CheckForHit,DISABLED);
             ILLUMINATE_OFF();
             break;
         }
@@ -132,6 +122,7 @@ void main(void)
     ScheduleTimerInit();
     HwInit();
     s = StateMachineCreate(rules, sizeof(rules),idle);
+	CallbackRegister(CheckForHit,50ul * _MILLISECOND);
     _EINT();
     Delay(2000ul * _MILLISECOND);
 

@@ -25,7 +25,9 @@
 #define INDICATE_TOGGLE()   HW_SET_TOGGLE(INDICATE)
 
 #define LASER_DETECT_1      1,0
+#define LASER_DETECT_1_ADC  0
 #define LASER_DETECT_2      1,1
+#define LASER_DETECT_2_ADC  1
 
 // Interrupt
 #define NUM_P1_INTS 2
