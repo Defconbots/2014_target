@@ -143,7 +143,6 @@ uint8_t QueuePeek(StateMachine* s)
 int8_t StateMachinePublishEvent(StateMachine* s, uint8_t event)
 {
     int8_t ret = FAILURE;
-
     if (s->event_cnt < MAX_EVENT_CNT)
     {
         if (s->start + s->event_cnt == MAX_EVENT_CNT)
@@ -155,6 +154,7 @@ int8_t StateMachinePublishEvent(StateMachine* s, uint8_t event)
             s->event_queue[s->start + s->event_cnt] = event;
         }
         s->event_cnt++;
+        ret = SUCCESS;
     }
     return ret;
 }
