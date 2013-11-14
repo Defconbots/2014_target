@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -7179,7 +7179,7 @@ wire to board 1.25 mm (.049 inch) pitch header</description>
 <part name="Q1" library="SparkFun" deviceset="CRYSTAL" device="EPSONMC146" value="732-MC14632.76KA-A0R"/>
 <part name="GND3" library="supply1" deviceset="GND" device=""/>
 <part name="GND4" library="supply1" deviceset="GND" device=""/>
-<part name="R17" library="rcl" deviceset="R-US_" device="R0603" value="660-RK73H1JTTD4702F"/>
+<part name="R17" library="rcl" deviceset="R-US_" device="R0603" value="71-CRCW06035M90FKEA"/>
 <part name="U1" library="linear" deviceset="MCP1703" device="CB" value="579-MCP1703T-3002ECB"/>
 <part name="+3V1" library="supply1" deviceset="+3V3" device=""/>
 <part name="GND1" library="supply1" deviceset="GND" device=""/>
@@ -7201,7 +7201,7 @@ wire to board 1.25 mm (.049 inch) pitch header</description>
 <part name="X2" library="con-molex" deviceset="53?-04" device="261" value="798-DF134P125H51"/>
 <part name="X1" library="con-molex" deviceset="53?-04" device="261" value="798-DF134P125H51"/>
 <part name="U4" library="torpedo" deviceset="CLS15" device="CLS15" value="638-CLS1522CL213RTR8"/>
-<part name="R20" library="rcl" deviceset="R-US_" device="R0603" value="660-RK73H1JTTD4702F"/>
+<part name="R20" library="rcl" deviceset="R-US_" device="R0603" value="71-CRCW06035M90FKEA"/>
 <part name="+3V5" library="supply1" deviceset="+3V3" device=""/>
 <part name="GND6" library="supply1" deviceset="GND" device=""/>
 <part name="LED11" library="SparkFun-LED" deviceset="LED" device="0603" value="78-VLMB1300-GS08"/>
