@@ -67,14 +67,14 @@ void idle(uint8_t ev)
     {
         case ENTER:
         {
-        	CallbackMode(CheckForHit,ENABLED);
+            CallbackMode(CheckForHit,ENABLED);
             ILLUMINATE_ON();
             INDICATE_OFF();
             break;
         }
         case EXIT:
         {
-        	CallbackMode(CheckForHit,DISABLED);
+            CallbackMode(CheckForHit,DISABLED);
             ILLUMINATE_OFF();
             break;
         }
@@ -122,7 +122,7 @@ void main(void)
     ScheduleTimerInit();
     HwInit();
     s = StateMachineCreate(rules, sizeof(rules),idle);
-	CallbackRegister(CheckForHit,50ul * _MILLISECOND);
+    CallbackRegister(CheckForHit,50ul * _MILLISECOND);
     _EINT();
     Delay(2000ul * _MILLISECOND);
 
