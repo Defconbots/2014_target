@@ -14,27 +14,38 @@
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 // LEDs
-#define ILLUMINATE          2,1
-#define ILLUMINATE_ON()     HW_SET_HIGH(ILLUMINATE)
-#define ILLUMINATE_OFF()    HW_SET_LOW(ILLUMINATE)
-#define ILLUMINATE_TOGGLE() HW_SET_TOGGLE(ILLUMINATE)
+#define RED             1,2
+#define RED_ON()        HW_SET_HIGH(RED)
+#define RED_OFF()       HW_SET_LOW(RED)
+#define RED_TOGGLE()    HW_SET_TOGGLE(RED)
 
-#define INDICATE            2,2
-#define INDICATE_ON()       HW_SET_LOW(INDICATE)
-#define INDICATE_OFF()      HW_SET_HIGH(INDICATE)
-#define INDICATE_TOGGLE()   HW_SET_TOGGLE(INDICATE)
+#define BLUE            1,3
+#define BLUE_ON()       HW_SET_HIGH(BLUE)
+#define BLUE_OFF()      HW_SET_LOW(BLUE)
+#define BLUE_TOGGLE()   HW_SET_TOGGLE(BLUE)
 
-#define LASER_DETECT_1      1,0
-#define LASER_DETECT_1_ADC  0
-#define LASER_DETECT_2      1,1
-#define LASER_DETECT_2_ADC  1
+// Inter-module comm.
+#define CNT             1,0
+#define SET             1,1
 
-// Interrupt
-#define NUM_P1_INTS 2
+// Interrupt config
+#define NUM_P1_INTS     2
 
-// I2C
-#define ADDRESS             0x0F
-#define DAT                 1,7
-#define CLK                 1,6
+// Light sensor
+#define SYNC            1,4
+#define SYNC_LOW()      HW_SET_LOW(SYNC)
+#define INT             1,5
+
+#define DAT             1,7
+#define DAT_LOW()       HW_SET_LOW(DAT)
+#define DAT_HIGH()      HW_SET_HIGH(DAT)
+#define DAT_INPUT()     HW_INPUT(DAT)
+#define DAT_OUTPUT()    HW_OUTPUT(DAT)
+#define DAT_READ()      HW_READ(DAT)
+#define CLK             1,6
+#define CLK_LOW()       HW_SET_LOW(CLK)
+#define CLK_HIGH()      HW_SET_HIGH(CLK)
+#define CLK_INPUT()     HW_INPUT(CLK)
+#define CLK_OUTPUT()    HW_OUTPUT(CLK)
 
 #endif

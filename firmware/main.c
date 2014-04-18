@@ -6,11 +6,14 @@
 #include "hardware_init.h"
 #include "interrupt.h"
 #include "state.h"
-#include "adc.h"
+#include "tcs3414_color_sensor.h"
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //                        State machine config
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//StateMachine s;
+
 enum Event
 {
     DEFAULT_EVENTS,     // Enter, idle, exit
@@ -21,7 +24,6 @@ enum Event
 void idle(uint8_t ev);
 void i_am_shot(uint8_t ev);
 
-StateMachine s;
 
 Transition rules[] =
 {
@@ -34,13 +36,13 @@ Transition rules[] =
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 void HwInit(void)
 {
-    AdcInit();
-    HW_INPUT(LASER_DETECT_1);
-    HW_INPUT(LASER_DETECT_2);
-    HW_OUTPUT(ILLUMINATE);
-    ILLUMINATE_ON();
-    HW_OUTPUT(INDICATE);
-    INDICATE_ON();
+    HW_OUTPUT(RED);
+    RED_OFF();
+    HW_OUTPUT(BLUE);
+    BLUE_OFF();
+
+    HW_OUTPUT(SYNC);
+    SYNC_LOW();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -48,14 +50,7 @@ void HwInit(void)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 void CheckForHit(void)
 {
-    static uint32_t laser_hit_count;
-    uint16_t sample = AdcRead(LASER_DETECT_1_ADC);
-    laser_hit_count = (sample > 400) ? laser_hit_count + 1 : 0;
-    if (laser_hit_count > 5)
-    {
-        StateMachinePublishEvent(&s,OMG_LASER_PEW_PEW);
-        laser_hit_count = 0;
-    }
+
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -63,53 +58,10 @@ void CheckForHit(void)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 void idle(uint8_t ev)
 {
-    switch (ev)
-    {
-        case ENTER:
-        {
-            CallbackMode(CheckForHit,ENABLED);
-            ILLUMINATE_ON();
-            INDICATE_OFF();
-            break;
-        }
-        case EXIT:
-        {
-            CallbackMode(CheckForHit,DISABLED);
-            ILLUMINATE_OFF();
-            break;
-        }
-    }
 }
 
 void i_am_shot(uint8_t ev)
 {
-    static uint8_t hit_count;
-    switch (ev)
-    {
-        case ENTER:
-        {
-            uint8_t i = 0;
-            hit_count = (hit_count < 3) ? hit_count + 1 : 1;
-            for (i = 0;i < hit_count;i++)
-            {
-                INDICATE_ON();
-                Delay(500ul * _MILLISECOND);
-                INDICATE_OFF();
-                Delay(500ul * _MILLISECOND);
-            }
-            Delay(500ul * _MILLISECOND);
-            break;
-        }
-        case IDLE:
-        {
-            StateMachinePublishEvent(&s,HIT_TIMEOUT);
-            break;
-        }
-        case EXIT:
-        {
-            break;
-        }
-    }    
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -118,16 +70,17 @@ void i_am_shot(uint8_t ev)
 void main(void)
 {
     WD_STOP();
-    ClockConfig(16);
+    ClockConfig(8);
     ScheduleTimerInit();
     HwInit();
-    s = StateMachineCreate(rules, sizeof(rules),idle);
-    CallbackRegister(CheckForHit,50ul * _MILLISECOND);
+    //s = StateMachineCreate(rules,sizeof(rules),idle);
     _EINT();
-    Delay(2000ul * _MILLISECOND);
-
+    Tcs3414Init();
     while (1)
     {
-        StateMachineRun(&s);
+        uint16_t test = Tcs3414ReadColor(COLOR_CLEAR);
+        Delay(3000 - test);
+        BLUE_TOGGLE();
+        //Tcs3414Shutdown();
     }
 }
