@@ -33,7 +33,6 @@ static void InterruptRunOnPort(uint8_t port);
 // Delay() implementation will also not work as it relies on timers.
 void InterruptAttach(uint8_t port, uint8_t pin, InterruptFn func, enum IntEdgeType type)
 {
-
 #define ATTACH_CASE(x)                  \
     case x:                             \
         p##x##_int_table[pin] = func;   \
@@ -49,6 +48,7 @@ void InterruptAttach(uint8_t port, uint8_t pin, InterruptFn func, enum IntEdgeTy
         P##x##IFG &= ~_BV(pin);         \
         break;
 
+    _DINT();
     switch (port)
     {
 #ifdef NUM_P1_INTS
@@ -59,12 +59,12 @@ void InterruptAttach(uint8_t port, uint8_t pin, InterruptFn func, enum IntEdgeTy
 #endif
     }
 #undef ATTACH_CASE
+    _EINT();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 void InterruptDetach(uint8_t port, uint8_t pin)
 {
-
 #define DETACH_CASE(x)                  \
     case x:                             \
         p##x##_int_table[pin] = NULL;   \
@@ -72,6 +72,7 @@ void InterruptDetach(uint8_t port, uint8_t pin)
         P##x##IFG &= ~_BV(pin);         \
         break;
 
+    _DINT();
     switch (port)
     {
 #ifdef NUM_P1_INTS
@@ -82,6 +83,7 @@ void InterruptDetach(uint8_t port, uint8_t pin)
 #endif
     }
 #undef DETACH_CASE
+    _EINT();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

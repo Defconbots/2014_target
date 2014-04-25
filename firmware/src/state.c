@@ -57,12 +57,12 @@ static State LookupTransition(StateMachine* s, uint8_t event);
 //                        /___//_/ /_//_/ \__/
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-StateMachine StateMachineCreate(Transition* rules, uint8_t t_size, State state)
+StateMachine StateMachineCreate(const Transition* rules, uint8_t t_size, State state)
 {
     StateMachine s;
     s.start = 0;
     s.event_cnt = 0;
-    s.transitions = rules;
+    s.transitions = (Transition*)rules;
     s.transition_table_size = (t_size / sizeof(Transition));
     s.state = state;
     StateMachinePublishEvent(&s, ENTER);
@@ -76,10 +76,8 @@ uint8_t QueuePeek(StateMachine* s)
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-int8_t StateMachinePublishEvent(StateMachine* s, uint8_t event)
+void StateMachinePublishEvent(StateMachine* s, uint8_t event)
 {
-    int8_t ret = FAILURE;
-
     if (s->event_cnt < MAX_EVENT_CNT)
     {
         if (s->start + s->event_cnt == MAX_EVENT_CNT)
@@ -92,7 +90,6 @@ int8_t StateMachinePublishEvent(StateMachine* s, uint8_t event)
         }
         s->event_cnt++;
     }
-    return ret;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -153,5 +150,6 @@ void StateMachineRun(StateMachine* s)
         s->state = next_state;
         (s->state)(ENTER);
     }
-    (s->state)(DequeueEvent(s));
+    uint8_t ev = DequeueEvent(s);
+    (s->state)(ev);
 }

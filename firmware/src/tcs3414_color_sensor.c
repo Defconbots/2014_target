@@ -74,12 +74,12 @@ void WriteByte(uint8_t command, uint8_t value)
 void Tcs3414Init(void)
 {
     // Turn off
-    WriteByte(TCS3414_REGISTER_CONTROL | TCS3414_COMMAND_BIT, TCS3414_CONTROL_POWEROFF);
-    Delay(10 * _MILLISECOND);
+    //WriteByte(TCS3414_REGISTER_CONTROL | TCS3414_COMMAND_BIT, TCS3414_CONTROL_POWEROFF);
+    //Delay(10 * _MILLISECOND);
     // Turn on
     WriteByte(TCS3414_REGISTER_CONTROL | TCS3414_COMMAND_BIT, TCS3414_CONTROL_POWERON);
     // Integration time to 100ms
-    WriteByte(TCS3414_REGISTER_TIMING | TCS3414_COMMAND_BIT, TCS3414_INTEGRATION_TIME_100MS);
+    WriteByte(TCS3414_REGISTER_TIMING | TCS3414_COMMAND_BIT, TCS3414_INTEGRATION_TIME_12MS);
     // ADC gain to 4X
     WriteByte(TCS3414_REGISTER_GAIN | TCS3414_COMMAND_BIT, TCS3414_GAIN_4X);
     // Turn on the ADC.
@@ -89,7 +89,6 @@ void Tcs3414Init(void)
 void Tcs3414Shutdown(void)
 {
     WriteByte(TCS3414_REGISTER_CONTROL | TCS3414_COMMAND_BIT, TCS3414_CONTROL_POWEROFF);
-    Delay(10 * _MILLISECOND);
 }
 
 ColorReading Tcs3414ReadAllColors(void)
@@ -112,21 +111,25 @@ uint16_t Tcs3414ReadColor(enum Color c)
         {
             low  = ReadByte(TCS3414_REGISTER_REDLOW  | TCS3414_COMMAND_BIT);
             high = ReadByte(TCS3414_REGISTER_REDHIGH | TCS3414_COMMAND_BIT);
+            break;
         }
         case COLOR_GREEN:
         {
             low  = ReadByte(TCS3414_REGISTER_GREENLOW  | TCS3414_COMMAND_BIT);
             high = ReadByte(TCS3414_REGISTER_GREENHIGH | TCS3414_COMMAND_BIT);
+            break;
         }
         case COLOR_BLUE:
         {
             low  = ReadByte(TCS3414_REGISTER_BLUELOW  | TCS3414_COMMAND_BIT);
             high = ReadByte(TCS3414_REGISTER_BLUEHIGH | TCS3414_COMMAND_BIT);
+            break;
         }
         case COLOR_CLEAR:
         {
             low  = ReadByte(TCS3414_REGISTER_CLEARLOW  | TCS3414_COMMAND_BIT);
             high = ReadByte(TCS3414_REGISTER_CLEARHIGH | TCS3414_COMMAND_BIT);
+            break;
         }
     }
     return ((high << 8) | low);

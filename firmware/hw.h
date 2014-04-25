@@ -26,7 +26,9 @@
 
 // Inter-module comm.
 #define CNT             1,0
+#define CNT_READ()      HW_READ(CNT)
 #define SET             1,1
+#define SET_READ()      HW_READ(SET)
 
 // Interrupt config
 #define NUM_P1_INTS     2

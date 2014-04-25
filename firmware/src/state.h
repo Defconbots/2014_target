@@ -47,7 +47,7 @@ it needs.
 @param[in] state The initial state of the state machine
 @return A pointer to the state machine struct
 */
-extern StateMachine StateMachineCreate(Transition* rules, uint8_t t_size, State state);
+extern StateMachine StateMachineCreate(const Transition* rules, uint8_t t_size, State state);
 
 /**
 @brief Queue a new event
@@ -55,9 +55,8 @@ extern StateMachine StateMachineCreate(Transition* rules, uint8_t t_size, State 
 Pushes a new event in to the event queue and adjust the size.
 @param[in] s A pointer to state machine to publish to
 @param[in] event The event to enqueue.
-@return SUCCESS if event was queued, FAILURE otherwise
 */
-extern int8_t StateMachinePublishEvent(StateMachine* s, uint8_t event);
+extern void StateMachinePublishEvent(StateMachine* s, uint8_t event);
 
 /**
 @brief Run the state machine
