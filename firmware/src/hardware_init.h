@@ -60,10 +60,10 @@
 #define _PULL_UP                OP_SET
 // Set pin as input before calling this macro
 /**@brief Set resistor polarity (up or down) for IO pin */
-#define HW_PULL(n,op)           HW_RES_(n,_ENABLE);\
-                                HW_SET_(n,op)
-#define HW_PULL_UP(n)           HW_PULL_(n,_PULL_UP)
-#define HW_PULL_DOWN(n)         HW_PULL_(n,_PULL_DOWN)
+#define HW_PULL(p,i,op)         HW_RES_(p,i,_ENABLE);\
+                                HW_SET_(p,i,op)
+#define HW_PULL_UP(n)           HW_PULL(n,_PULL_UP)
+#define HW_PULL_DOWN(n)         HW_PULL(n,_PULL_DOWN)
 
 /**@brief Read in state of IO pin */
 #define HW_READ(n)              HW_READ_(n)
