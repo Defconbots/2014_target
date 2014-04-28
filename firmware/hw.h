@@ -31,7 +31,7 @@
 #define SET_READ()      HW_READ(SET)
 
 // Interrupt config
-#define NUM_P1_INTS     2
+#define NUM_P1_INTS     4
 
 // Light sensor
 #define SYNC            1,4

@@ -129,7 +129,7 @@ int8_t CallbackRegister(CallbackFn func, uint32_t run_time)
         callback_store[event_count].enabled       = FALSE;
         callback_store[event_count].func          = func;
         callback_store[event_count].run_time      = run_time - 1;
-        callback_store[event_count].next_run_time = now + run_time;
+        callback_store[event_count].next_run_time = now + (run_time * _MILLISECOND);
         event_count++;
         return (SUCCESS);
     }
@@ -151,7 +151,7 @@ void CallbackService(uint32_t current_time)
             current_time == callback_store[i].next_run_time)
         {
             callback_store[i].next_run_time = current_time +
-                                              callback_store[i].run_time;
+                                              (callback_store[i].run_time * _MILLISECOND);
             callback_store[i].func();
             if (--callbacks_remaining == 0)
             {
@@ -175,7 +175,7 @@ void CallbackMode(CallbackFn func, enum ScheduleMode mode)
             if (mode)
             {
                 callback_store[i].next_run_time = now +
-                                                  callback_store[i].run_time;
+                                                  (callback_store[i].run_time * _MILLISECOND);
             }
             break;
         }
@@ -205,7 +205,7 @@ int8_t CalloutRegister(CalloutFn func, uint32_t run_time)
                 callout_map |= _BV(i);
                 // save our data
                 callout_store[i].func = func;
-                callout_store[i].run_time = now + run_time;
+                callout_store[i].run_time = now + (run_time * _MILLISECOND);
                 return (SUCCESS);
             }
         }

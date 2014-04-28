@@ -44,6 +44,9 @@ const Transition rules[] =
 
 static uint8_t kill_count = 0xFF;
 
+static uint16_t ambient_red = 0;
+static uint16_t ambient_green = 0;
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //                             Hardware init
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -53,7 +56,7 @@ void HwInit(void)
     HW_OUTPUT(RED);
     RED_OFF();
     HW_OUTPUT(BLUE);
-    BLUE_OFF();
+    BLUE_ON();
 
     // TCS3414
     HW_OUTPUT(SYNC);
@@ -74,56 +77,47 @@ void CheckForHit(void)
     static uint32_t laser_hit_count = 0;
     uint16_t red   = Tcs3414ReadColor(COLOR_RED);
     uint16_t green = Tcs3414ReadColor(COLOR_GREEN);
-    uint8_t hit = (red > 50 && green < 200);
+    uint8_t hit = (red > (ambient_red + 20)) && (green < (ambient_green + 50));
     if (hit)
     {
-        laser_hit_count++;
+    	laser_hit_count++;
     }
     else
     {
-        if (laser_hit_count >= 3)// && laser_hit_count < 30) // 300-800ms
-        {
-            StateMachinePublishEvent(&s,STUN);
-        }
-        laser_hit_count = 0;
+    	if (laser_hit_count >= 6 && laser_hit_count < 20) // 300-800ms
+    	{
+    		StateMachinePublishEvent(&s,STUN);
+    	}
+		laser_hit_count = 0;
     }
 }
 
 void ConfigThrow(void)
 {
-    static uint8_t edge = 0;
-    uint8_t glitch = 0;
-    while (glitch++ < 50)
-    {
-        if ((edge && !SET_READ()) || (!edge && SET_READ()))
-        {
-            return;
-        }
-    }
-    if (edge)
-    {
-        InterruptAttach(SET,ConfigThrow,FALLING);
-        edge = 0;
-    }
-    else
-    {
-        InterruptAttach(SET,ConfigThrow,RISING);
-        edge = 1;
-    }
+	uint8_t glitch = 0;
+	while (glitch++ < 10)
+	{
+	    DumbDelay(1000);
+		if (SET_READ())
+		{
+			return;
+		}
+	}
     StateMachinePublishEvent(&s,CONFIG);
 }
 
 void CntTick(void)
 {
-    uint8_t glitch = 0;
-    while (glitch++ < 50)
-    {
-        if (CNT_READ())
-        {
-            return;
-        }
-    }
-    StateMachinePublishEvent(&s,CNT_TICK);
+	uint8_t glitch = 0;
+	while (glitch++ < 10)
+	{
+	    DumbDelay(1000);
+		if (CNT_READ())
+		{
+			return;
+		}
+	}
+	StateMachinePublishEvent(&s,CNT_TICK);
 }
 
 
@@ -139,7 +133,7 @@ void Idle(uint8_t ev)
             CallbackMode(CheckForHit,ENABLED);
             BLUE_ON();
             RED_OFF();
-            Delay(1000ul * _MILLISECOND);
+            Delay(1000);
             break;
         }
         case EXIT:
@@ -157,12 +151,20 @@ void Config(uint8_t ev)
     {
         case ENTER:
         {
-            kill_count = 0;
+            kill_count = 1;
             break;
         }
         case CNT_TICK:
         {
             kill_count++;
+            uint8_t i = kill_count;
+            while (i--)
+            {
+                RED_ON();
+                Delay(50);
+                RED_OFF();
+                Delay(250);
+            }
             break;
         }
         case EXIT:
@@ -182,21 +184,21 @@ void Stunned(uint8_t ev)
             RED_ON();
             HW_OUTPUT(SET);
             HW_SET_LOW(SET);
-            //Tcs3414Shutdown();
+            Tcs3414Shutdown();
             kill_count--;
-            Delay(3000ul * _MILLISECOND);
             break;
         }
         case IDLE:
         {
-            StateMachinePublishEvent(&s, kill_count ? STUN_TIMEOUT : KILL);
-            break;
+            Delay(3000);
+        	StateMachinePublishEvent(&s, kill_count ? STUN_TIMEOUT : KILL);
+        	break;
         }
         case EXIT:
         {
             HW_SET_HIGH(SET);
             HW_INPUT(SET);
-            //Tcs3414Init();
+            Tcs3414Init();
             break;
         }
     }
@@ -218,6 +220,23 @@ void Dead(uint8_t ev)
         }
     }
 }
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//                              Utilities
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+void RecordAmbientLight(uint8_t num_samples)
+{
+    uint8_t i = 0;
+    uint16_t red_sum = 0;
+    uint16_t green_sum = 0;
+    for (i = 0;i < num_samples;i++)
+    {
+        red_sum += Tcs3414ReadColor(COLOR_RED);
+        green_sum += Tcs3414ReadColor(COLOR_GREEN);
+        Delay(500);
+    }
+    ambient_red = red_sum / num_samples;
+    ambient_green = green_sum / num_samples;
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //                                  Entry
@@ -230,11 +249,12 @@ void main(void)
     HwInit();
     Tcs3414Init();
     s = StateMachineCreate(rules,sizeof(rules), Idle);
-    CallbackRegister(CheckForHit,100ul * _MILLISECOND);
     InterruptAttach(SET,ConfigThrow,FALLING);
     InterruptAttach(CNT,CntTick,FALLING);
     _EINT();
-    Delay(1000ul * _MILLISECOND);
+    Delay(500);
+    RecordAmbientLight(5);
+    CallbackRegister(CheckForHit,50);
     while (1)
     {
         StateMachineRun(&s);

@@ -48,7 +48,7 @@ void InterruptAttach(uint8_t port, uint8_t pin, InterruptFn func, enum IntEdgeTy
         P##x##IFG &= ~_BV(pin);         \
         break;
 
-    _DINT();
+	_DINT();
     switch (port)
     {
 #ifdef NUM_P1_INTS
@@ -72,7 +72,7 @@ void InterruptDetach(uint8_t port, uint8_t pin)
         P##x##IFG &= ~_BV(pin);         \
         break;
 
-    _DINT();
+	_DINT();
     switch (port)
     {
 #ifdef NUM_P1_INTS

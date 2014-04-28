@@ -11,7 +11,8 @@
 void Delay(uint32_t delay_time)
 {
     uint32_t start_time = TimeNow();
-    while(TimeNow() < (start_time + delay_time));
+    uint32_t end_time = start_time + (delay_time * _MILLISECOND);
+    while(TimeNow() < end_time);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
