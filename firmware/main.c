@@ -132,7 +132,6 @@ void Idle(uint8_t ev)
         {
             CallbackMode(CheckForHit,ENABLED);
             BLUE_ON();
-            RED_OFF();
             Delay(1000);
             break;
         }
@@ -169,7 +168,6 @@ void Config(uint8_t ev)
         }
         case EXIT:
         {
-            RED_OFF();
             break;
         }
     }
@@ -199,6 +197,7 @@ void Stunned(uint8_t ev)
             HW_SET_HIGH(SET);
             HW_INPUT(SET);
             Tcs3414Init();
+            RED_OFF();
             break;
         }
     }
@@ -210,11 +209,13 @@ void Dead(uint8_t ev)
     {
         case ENTER:
         {
+            RED_ON();
             Tcs3414Shutdown();
             break;
         }
         case EXIT:
         {
+            RED_OFF();
             Tcs3414Init();
             break;
         }
