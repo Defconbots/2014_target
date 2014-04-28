@@ -72,7 +72,14 @@ StateMachine StateMachineCreate(const Transition* rules, uint8_t t_size, State s
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 uint8_t QueuePeek(StateMachine* s)
 {
-    return s->event_cnt ? s->event_queue[s->start] : IDLE;
+    if (s->event_cnt)
+    {
+        return s->event_queue[s->start];
+    }
+    else
+    {
+        return IDLE;
+    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -139,17 +146,17 @@ State LookupTransition(StateMachine* s, uint8_t event)
 void StateMachineRun(StateMachine* s)
 {
     // peek at the next event in the queue
-    uint8_t next_event = QueuePeek(s);
+    uint8_t next_event = DequeueEvent(s);
     State next_state = LookupTransition(s, next_event);
     // Will this cause a transition?
     if (s->state != next_state)
     {
-        // pop the event but don't pass it into the state
-        DequeueEvent(s);
         (s->state)(EXIT);
         s->state = next_state;
         (s->state)(ENTER);
     }
-    uint8_t ev = DequeueEvent(s);
-    (s->state)(ev);
+    else
+    {
+        (s->state)(next_event);
+    }
 }
