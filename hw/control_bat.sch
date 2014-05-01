@@ -859,7 +859,7 @@ wire to board 1.25 mm (.049 inch) pitch header</description>
 <instance part="GND3" gate="1" x="71.12" y="25.4"/>
 <instance part="GND4" gate="1" x="43.18" y="48.26"/>
 <instance part="S3" gate="1" x="30.48" y="53.34"/>
-<instance part="G1" gate="G$1" x="12.7" y="33.02" rot="R270"/>
+<instance part="G1" gate="G$1" x="12.7" y="40.64" rot="MR90"/>
 </instances>
 <busses>
 </busses>
@@ -871,11 +871,6 @@ wire to board 1.25 mm (.049 inch) pitch header</description>
 <pinref part="X1" gate="-2" pin="S"/>
 <pinref part="GND4" gate="1" pin="GND"/>
 <wire x1="43.18" y1="53.34" x2="43.18" y2="50.8" width="0.1524" layer="91"/>
-</segment>
-<segment>
-<pinref part="GND1" gate="1" pin="GND"/>
-<wire x1="12.7" y1="17.78" x2="12.7" y2="20.32" width="0.1524" layer="91"/>
-<pinref part="G1" gate="G$1" pin="+"/>
 </segment>
 <segment>
 <pinref part="S1" gate="S" pin="3"/>
@@ -892,6 +887,11 @@ wire to board 1.25 mm (.049 inch) pitch header</description>
 <pinref part="GND3" gate="1" pin="GND"/>
 <wire x1="71.12" y1="27.94" x2="71.12" y2="30.48" width="0.1524" layer="91"/>
 <junction x="71.12" y="30.48"/>
+</segment>
+<segment>
+<pinref part="G1" gate="G$1" pin="-"/>
+<pinref part="GND1" gate="1" pin="GND"/>
+<wire x1="12.7" y1="27.94" x2="12.7" y2="17.78" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="VIN" class="0">
@@ -928,10 +928,9 @@ wire to board 1.25 mm (.049 inch) pitch header</description>
 </net>
 <net name="N$4" class="0">
 <segment>
-<wire x1="12.7" y1="45.72" x2="12.7" y2="53.34" width="0.1524" layer="91"/>
 <pinref part="S3" gate="1" pin="P"/>
 <wire x1="12.7" y1="53.34" x2="27.94" y2="53.34" width="0.1524" layer="91"/>
-<pinref part="G1" gate="G$1" pin="-"/>
+<pinref part="G1" gate="G$1" pin="+"/>
 </segment>
 </net>
 </nets>

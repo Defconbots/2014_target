@@ -483,7 +483,7 @@ design rules under a new name.</description>
 <vertex x="92.71" y="0"/>
 <vertex x="0" y="0"/>
 </polygon>
-<contactref element="G1" pad="P"/>
+<contactref element="G1" pad="N"/>
 </signal>
 <signal name="VIN">
 <contactref element="X1" pad="1"/>
@@ -511,10 +511,9 @@ design rules under a new name.</description>
 </signal>
 <signal name="N$4">
 <contactref element="S3" pad="P$2"/>
-<wire x1="20.32" y1="2.54" x2="20.32" y2="6.35" width="0.6096" layer="1"/>
-<wire x1="20.32" y1="6.35" x2="22.991" y2="9.021" width="0.6096" layer="1"/>
-<contactref element="G1" pad="N"/>
-<wire x1="22.991" y1="9.021" x2="29.085" y2="9.021" width="0.6096" layer="1"/>
+<contactref element="G1" pad="P"/>
+<wire x1="29.085" y1="21.721" x2="20.32" y2="12.956" width="0.6096" layer="16"/>
+<wire x1="20.32" y1="12.956" x2="20.32" y2="2.54" width="0.6096" layer="16"/>
 </signal>
 </signals>
 </board>
