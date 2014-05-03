@@ -28,17 +28,6 @@ Removes an event from the event queue and passes it to the current state.
 static uint8_t DequeueEvent(StateMachine* s);
 
 /**
-@brief Peek at the event queue to see what the next event will be
-@details
-Peek at the queue without dequeuing the next item. We use this so check if a
-state transition will be coming so we can pass EXIT and ENTER events.
-@param[in] s A pointer to the state machine to check for events in
-@return If there are no events in the queue, IDLE. If there is a pending event in the
-queue we will return it.
-*/
-static uint8_t QueuePeek(StateMachine* s);
-
-/**
 @brief Get the next state from the transition table
 @details
 Get the next state from the transition table based on the current state and the
@@ -67,19 +56,6 @@ StateMachine StateMachineCreate(const Transition* rules, uint8_t t_size, State s
     s.state = state;
     StateMachinePublishEvent(&s, ENTER);
     return (s);
-}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-uint8_t QueuePeek(StateMachine* s)
-{
-    if (s->event_cnt)
-    {
-        return s->event_queue[s->start];
-    }
-    else
-    {
-        return IDLE;
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
