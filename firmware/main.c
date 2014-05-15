@@ -9,6 +9,8 @@
 #include "tcs3414_color_sensor.h"
 #include "juicy.h"
 
+// One target needs pullups enabled for the set/cnt lines
+//#define ENABLE_PULLUPS
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //                        Locals and State Machine config
@@ -65,9 +67,11 @@ void HwInit(void)
 
     // Intermodule Communication
     HW_INPUT(SET);
-    HW_PULL_UP(SET);
     HW_INPUT(CNT);
+#ifdef ENABLE_PULLUPS
+    HW_PULL_UP(SET);
     HW_PULL_UP(CNT);
+#endif
 }
 
 void RecordAmbientLight(uint8_t num_samples)
@@ -97,9 +101,9 @@ void BroadcastReset(void)
 {
     // Toggle high->low->high to force a CONFIG event on other targets
     HW_SET_HIGH(SET);
-    Delay(20);
+    Delay(500);
     HW_SET_LOW(SET);
-    Delay(20);
+    Delay(500);
     // Return to input/pullup state
     HW_SET_HIGH(SET);
     HW_INPUT(SET);
