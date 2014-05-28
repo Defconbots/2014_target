@@ -4,7 +4,7 @@
 #include "hardware_init.h"
 #include "hw.h"
 
-#define JUICY_LED_DELAY 5
+#define JUICY_LED_DELAY 3
 
 void JuicyBlueOn(void)
 {

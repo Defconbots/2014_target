@@ -47,8 +47,8 @@ const Transition rules[] =
 
 static uint8_t kill_count = 0xFF;
 
-static uint16_t ambient_red = 0;
-static uint16_t ambient_green = 0;
+static uint16_t red_thresh = 0;
+static uint16_t green_thresh = 0;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //                              Utilities
@@ -86,8 +86,8 @@ void RecordAmbientLight(uint8_t num_samples)
         green_sum += Tcs3414ReadColor(COLOR_GREEN);
         Delay(100);
     }
-    ambient_red = red_sum / num_samples;
-    ambient_green = green_sum / num_samples;
+    red_thresh = (red_sum / num_samples) + 20;
+    green_thresh = (green_sum / num_samples) + 200;
 }
 
 void BroadcastHit(void)
@@ -101,9 +101,9 @@ void BroadcastReset(void)
 {
     // Toggle high->low->high to force a CONFIG event on other targets
     HW_SET_HIGH(SET);
-    Delay(500);
+    Delay(250);
     HW_SET_LOW(SET);
-    Delay(500);
+    Delay(250);
     // Return to input/pullup state
     HW_SET_HIGH(SET);
     HW_INPUT(SET);
@@ -117,7 +117,7 @@ void CheckForHit(void)
     static uint32_t laser_hit_count = 0;
     uint16_t red   = Tcs3414ReadColor(COLOR_RED);
     uint16_t green = Tcs3414ReadColor(COLOR_GREEN);
-    uint8_t hit = (red > (ambient_red + 100)) && (green < (ambient_green + 200));
+    uint8_t hit = (red > red_thresh) && (green < green_thresh);
     if (hit)
     {
         laser_hit_count++;
@@ -132,32 +132,41 @@ void CheckForHit(void)
     }
 }
 
-void ConfigThrow(void)
+void SetPoll(void)
 {
-    uint8_t glitch = 0;
-    while (glitch++ < 100)
+    static uint8_t toggle = 0;
+    uint8_t down = !SET_READ();
+    if (down && !toggle)
     {
-        DumbDelay(1000);
-        if (SET_READ())
+        if (s.state == Config && kill_count == 0)
         {
-            return;
+            StateMachinePublishEvent(&s, KILL);
         }
+        else
+        {
+            StateMachinePublishEvent(&s, CONFIG);
+        }
+        toggle = 1;
     }
-    StateMachinePublishEvent(&s, CONFIG);
+    else if (!down && toggle)
+    {
+        toggle = 0;
+    }
 }
 
-void CntTick(void)
+void CntPoll(void)
 {
-    uint8_t glitch = 0;
-    while (glitch++ < 50)
+    static uint8_t toggle = 0;
+    uint8_t down = !CNT_READ();
+    if (down && !toggle)
     {
-        DumbDelay(1000);
-        if (CNT_READ())
-        {
-            return;
-        }
+        StateMachinePublishEvent(&s,CNT_TICK);
+        toggle = 1;
     }
-    StateMachinePublishEvent(&s,CNT_TICK);
+    else if (!down && toggle)
+    {
+        toggle = 0;
+    }
 }
 
 
@@ -171,12 +180,14 @@ void Detecting(uint8_t ev)
         case ENTER:
         {
             CallbackMode(CheckForHit,ENABLED);
+            CallbackMode(SetPoll,ENABLED);
             JuicyBlueOn();
             break;
         }
         case EXIT:
         {
             CallbackMode(CheckForHit,DISABLED);
+            CallbackMode(SetPoll,DISABLED);
             JuicyBlueOff();
             break;
         }
@@ -190,7 +201,8 @@ void Config(uint8_t ev)
     {
         case ENTER:
         {
-            InterruptAttach(CNT,CntTick,FALLING);
+            CallbackMode(CntPoll,ENABLED);
+            CallbackMode(SetPoll,ENABLED);
             break;
         }
         case CNT_TICK:
@@ -209,13 +221,13 @@ void Config(uint8_t ev)
             {
                 JuicyBothOn();
                 JuicyBothOff();
-                Delay(100);
             }
             break;
         }
         case EXIT:
         {
-            InterruptDetach(CNT);
+            CallbackMode(CntPoll,DISABLED);
+            CallbackMode(SetPoll,DISABLED);
             cnt_state = 0;
             break;
         }
@@ -228,8 +240,8 @@ void Stunned(uint8_t ev)
     {
         case ENTER:
         {
-            JuicyRedOn();
             BroadcastHit();
+            JuicyRedOn();
             Tcs3414Shutdown();
             kill_count--;
             break;
@@ -242,9 +254,7 @@ void Stunned(uint8_t ev)
         }
         case EXIT:
         {
-            InterruptDetach(SET);
             BroadcastReset();
-            InterruptAttach(SET,ConfigThrow,FALLING);
             Tcs3414Init();
             JuicyRedOff();
             break;
@@ -258,14 +268,13 @@ void Dead(uint8_t ev)
     {
         case ENTER:
         {
-            kill_count = 1;
-            JuicyRedOn();
+            CallbackMode(SetPoll,ENABLED);
             Tcs3414Shutdown();
             break;
         }
         case EXIT:
         {
-            JuicyRedOff();
+            CallbackMode(SetPoll,DISABLED);
             Tcs3414Init();
             break;
         }
@@ -283,13 +292,14 @@ void main(void)
     HwInit();
     Tcs3414Init();
     s = StateMachineCreate(rules,sizeof(rules), Detecting);
-    InterruptAttach(SET,ConfigThrow,FALLING);
     _EINT();
     JuicyBlueOn();
     RecordAmbientLight(10);
     JuicyBlueOff();
     Delay(1000);
     CallbackRegister(CheckForHit,50);
+    CallbackRegister(CntPoll,100);
+    CallbackRegister(SetPoll,100);
     while (1)
     {
         StateMachineRun(&s);
