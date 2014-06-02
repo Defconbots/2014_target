@@ -79,15 +79,15 @@ void RecordAmbientLight(uint8_t num_samples)
     uint8_t i = 0;
     uint16_t red_sum = 0;
     uint16_t green_sum = 0;
-    Delay(100); // integration time for sensor
+    Delay(500); // wait for it to settle after init
     for (i = 0;i < num_samples;i++)
     {
         red_sum += Tcs3414ReadColor(COLOR_RED);
         green_sum += Tcs3414ReadColor(COLOR_GREEN);
         Delay(100);
     }
-    red_thresh = (red_sum / num_samples) + 20;
-    green_thresh = (green_sum / num_samples) + 200;
+    red_thresh = ((red_sum / num_samples) * 15) / 10;
+    green_thresh = ((green_sum / num_samples) * 12) / 10;
 }
 
 void BroadcastHit(void)
@@ -101,9 +101,9 @@ void BroadcastReset(void)
 {
     // Toggle high->low->high to force a CONFIG event on other targets
     HW_SET_HIGH(SET);
-    Delay(250);
+    Delay(150);
     HW_SET_LOW(SET);
-    Delay(250);
+    Delay(150);
     // Return to input/pullup state
     HW_SET_HIGH(SET);
     HW_INPUT(SET);
@@ -124,7 +124,7 @@ void CheckForHit(void)
     }
     else
     {
-        if (laser_hit_count >= 6 && laser_hit_count < 20) // 300-800ms
+        if (laser_hit_count >= 9 && laser_hit_count < 22) //450-1100ms
         {
             StateMachinePublishEvent(&s,STUN);
         }
@@ -188,7 +188,6 @@ void Detecting(uint8_t ev)
         {
             CallbackMode(CheckForHit,DISABLED);
             CallbackMode(SetPoll,DISABLED);
-            JuicyBlueOff();
             break;
         }
     }
@@ -201,6 +200,7 @@ void Config(uint8_t ev)
     {
         case ENTER:
         {
+            JuicyBlueOff();
             CallbackMode(CntPoll,ENABLED);
             CallbackMode(SetPoll,ENABLED);
             break;
@@ -241,6 +241,7 @@ void Stunned(uint8_t ev)
         case ENTER:
         {
             BroadcastHit();
+            JuicyBlueOff();
             JuicyRedOn();
             Tcs3414Shutdown();
             kill_count--;
@@ -286,6 +287,7 @@ void Dead(uint8_t ev)
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 void main(void)
 {
+
     WD_STOP();
     ClockConfig(8);
     ScheduleTimerInit();
@@ -294,7 +296,7 @@ void main(void)
     s = StateMachineCreate(rules,sizeof(rules), Detecting);
     _EINT();
     JuicyBlueOn();
-    RecordAmbientLight(10);
+    RecordAmbientLight(25);
     JuicyBlueOff();
     Delay(1000);
     CallbackRegister(CheckForHit,50);
