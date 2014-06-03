@@ -200,7 +200,10 @@ void Config(uint8_t ev)
     {
         case ENTER:
         {
-            JuicyBlueOff();
+            if (kill_count)
+            {
+                JuicyBlueOff();
+            }
             CallbackMode(CntPoll,ENABLED);
             CallbackMode(SetPoll,ENABLED);
             break;
