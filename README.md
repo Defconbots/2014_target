@@ -6,8 +6,3 @@ This is the hardware and firmware design files for the defconbots 2014 laser tar
 
 The board is designed in EagleCad 6.x. All part numbers are mouser numbers for easy BOM export.
 
-## Design
-
-### Hardware
-
-### Firmware
